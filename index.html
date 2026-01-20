@@ -91,9 +91,9 @@ const GRID = 16, TILE = 40;
 const ALL_COLORS = ["#FF355E","#66FF66","#50BFE6", "#FFD700", "#FF8C00", "#A020F0"];
 
 const DIFF_CONFIG = [
-    { name: "EASY", colors: 3, densityBase: 0.18, sizeBase: 4, densityMax: 0.45 },
-    { name: "NORMAL", colors: 4, densityBase: 0.35, sizeBase: 5, densityMax: 0.55 },
-    { name: "HARD", colors: 5, densityBase: 0.50, sizeBase: 6, densityMax: 0.65 } 
+    { name: "EASY", colors: 3, densityBase: 0.1, sizeBase: 5, densityMax: 0.45 },
+    { name: "NORMAL", colors: 4, densityBase: 0.2, sizeBase: 7, densityMax: 0.45 },
+    { name: "HARD", colors: 4, densityBase: 0.3, sizeBase: 10, densityMax: 0.45 } 
 ];
 
 let diffIdx = 0; 
@@ -128,6 +128,7 @@ function startGameWithDiff(idx) {
 function toggleDifficulty() {
     diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
     applyDifficulty(diffIdx);
+    initGrid(false);
     // Keep current game running, but next levels will use new difficulty parameters
 }
 
@@ -213,9 +214,18 @@ function initGrid(isNextLevelTrigger=false){
     const density = Math.min(config.densityBase + (level * 0.015), config.densityMax);
     const s = Math.floor((GRID-size)/2), e = s + size - 1;
 
-    for(let y=s; y<=e; y++) {
-        for(let x=s; x<=e; x++) {
-            if(Math.random() < density) grid[y][x] = { color: getValidColor(x, y), isFixed: true };
+    let spawned = false;
+
+    while(!spawned) {
+        spawned = false; // reset for each attempt
+
+        for(let y = s; y <= e; y++) {
+            for(let x = s; x <= e; x++) {
+                if(Math.random() < density) {
+                    grid[y][x] = { color: getValidColor(x, y), isFixed: true };
+                    spawned = true; // at least one brick spawned
+                }
+            }
         }
     }
 
@@ -264,7 +274,7 @@ function undo(){
     updateUI(); 
 }
 
-function resetGame(){ if(confirm("Reset Level and Score?")) initGrid(false); }
+function resetGame(){ initGrid(false); }
 
 function handleInput(e) {
     if(activeProjectile || isTransitioning || isProcessingMomentum) return;
