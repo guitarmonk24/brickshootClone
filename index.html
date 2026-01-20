@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>BrickShooter: iOS Edition (Balanced)</title>
+<title>BrickShooter: iOS Edition</title>
 <style>
     body { 
         background:#121212; color:#fff; display:flex; flex-direction:column; 
@@ -34,11 +34,16 @@
     }
     #game-over { display: none; background: rgba(40,0,0,0.9); }
 
+    .menu-buttons { display: flex; flex-direction: column; gap: 12px; }
+    .menu-btn { font-size: 1.2rem; width: 220px; }
+    .btn-easy { background: #66FF66; color: #000; }
+    .btn-normal { background: #50BFE6; color: #000; }
+    .btn-hard { background: #FF355E; color: #fff; }
+
     #level-banner {
         position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
         font-size:3rem; color:#ffcc00; opacity:0; transition:0.5s; pointer-events:none; z-index: 10;
     }
-    .start-btn { font-size:1.5rem; background:#FF355E; width: 220px; }
     .restart-btn { font-size:1.5rem; background:#50BFE6; width: 220px; }
 </style>
 </head>
@@ -46,8 +51,12 @@
 <body>
 <div id="overlay">
     <h1 style="color:#ffcc00; margin-bottom: 0;">BRICK SHOOTER</h1>
-    <p style="color: #aaa;">Clear ALL center blocks to win.</p>
-    <button class="start-btn" onclick="startApp()">START GAME</button>
+    <p style="color: #aaa; margin-bottom: 10px;">Select Difficulty to Start</p>
+    <div class="menu-buttons">
+        <button class="menu-btn btn-easy" onclick="startGameWithDiff(0)">EASY</button>
+        <button class="menu-btn btn-normal" onclick="startGameWithDiff(1)">NORMAL</button>
+        <button class="menu-btn btn-hard" onclick="startGameWithDiff(2)">HARD</button>
+    </div>
 </div>
 
 <div id="game-over">
@@ -100,21 +109,26 @@ window.addEventListener('keydown', (e) => {
     }
 });
 
-function toggleDifficulty() {
-    diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
+function applyDifficulty(idx) {
+    diffIdx = idx;
     const config = DIFF_CONFIG[diffIdx];
     activeColors = ALL_COLORS.slice(0, config.colors);
     document.getElementById('diff-btn').textContent = `Difficulty: ${config.name}`;
-    score = 0; level = 1;
-    initGrid(false); 
 }
 
-function startApp() {
+function startGameWithDiff(idx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
+    applyDifficulty(idx);
     document.getElementById('overlay').style.display = 'none';
     initGrid(false);
     loop();
+}
+
+function toggleDifficulty() {
+    diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
+    applyDifficulty(diffIdx);
+    // Keep current game running, but next levels will use new difficulty parameters
 }
 
 function playSound(type) {
@@ -212,7 +226,7 @@ function initGrid(isNextLevelTrigger=false){
         for(let y=3; y<=12; y++) {
             for(let x=3; x<=12; x++) {
                 if(!grid[y][x]) continue;
-                let q=[[x,y]], seen=new Set([x+","+y]), col=grid[y][x].color;
+                let col=grid[y][x].color;
                 let stack = [[x,y]], visited = new Set([x+","+y]);
                 while(stack.length){
                     let [cx,cy] = stack.pop();
