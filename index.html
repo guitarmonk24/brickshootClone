@@ -126,6 +126,7 @@ function startGameWithDiff(idx) {
 }
 
 function toggleDifficulty() {
+    resetGame()
     diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
     applyDifficulty(diffIdx);
     initGrid(false);
@@ -274,7 +275,7 @@ function undo(){
     updateUI(); 
 }
 
-function resetGame(){ initGrid(false); }
+function resetGame(){ if(confirm("Reset Level and Score?")) initGrid(false); }
 
 function handleInput(e) {
     if(activeProjectile || isTransitioning || isProcessingMomentum) return;
@@ -458,3 +459,4 @@ function loop(){
 </script>
 </body>
 </html>
+
