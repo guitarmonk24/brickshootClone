@@ -26,6 +26,7 @@
     button:active { transform: scale(0.95); background: #555; }
     
     .diff-toggle { background: #333; border: 1px solid #ffcc00; color: #ffcc00; }
+    .mute-btn { background: #555; min-width: 80px; }
 
     #overlay, #game-over {
         position: fixed; top:0; left:0; width:100%; height:100%;
@@ -73,6 +74,7 @@
 </div>
 
 <div class="controls">
+    <button class="mute-btn" id="mute-btn" onclick="toggleMute()">Mute</button>
     <button class="diff-toggle" id="diff-btn" onclick="toggleDifficulty()">Difficulty: Easy</button>
     <button onclick="undo()">Undo</button>
     <button onclick="resetGame()">Reset</button>
@@ -98,7 +100,7 @@ const DIFF_CONFIG = [
 
 let diffIdx = 0; 
 let activeColors = ALL_COLORS.slice(0, DIFF_CONFIG[diffIdx].colors);
-let grid=[], score=0, level=1, history=[];
+let grid=[], score=0, level=1, history=[], isMuted = false;
 let activeProjectile=null, pulse=0, shake=0, particles = [], isTransitioning = false, isProcessingMomentum = false;
 let audioCtx;
 
@@ -125,6 +127,12 @@ function startGameWithDiff(idx) {
     loop();
 }
 
+function toggleMute() {
+    isMuted = !isMuted;
+    document.getElementById('mute-btn').textContent = isMuted ? "Unmute" : "Mute";
+    document.getElementById('mute-btn').style.background = isMuted ? "#ff355e" : "#555";
+}
+
 function toggleDifficulty() {
     if (confirm("Changing difficulty will reset your current score and level. Continue?")) {
         diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
@@ -134,7 +142,7 @@ function toggleDifficulty() {
 }
 
 function playSound(type) {
-    if (!audioCtx) return;
+    if (!audioCtx || isMuted) return;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.connect(gain); gain.connect(audioCtx.destination);
@@ -216,21 +224,17 @@ function initGrid(isNextLevelTrigger=false){
     const s = Math.floor((GRID-size)/2), e = s + size - 1;
 
     let spawned = false;
-
     while(!spawned) {
-        spawned = false; // reset for each attempt
-
         for(let y = s; y <= e; y++) {
             for(let x = s; x <= e; x++) {
                 if(Math.random() < density) {
                     grid[y][x] = { color: getValidColor(x, y), isFixed: true };
-                    spawned = true; // at least one brick spawned
+                    spawned = true; 
                 }
             }
         }
     }
 
-    // Pre-clear logic
     let clearing = true;
     while(clearing) {
         let toDelete = [];
@@ -459,5 +463,3 @@ function loop(){
 </script>
 </body>
 </html>
-
-
