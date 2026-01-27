@@ -126,11 +126,11 @@ function startGameWithDiff(idx) {
 }
 
 function toggleDifficulty() {
-    resetGame()
-    diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
-    applyDifficulty(diffIdx);
-    initGrid(false);
-    // Keep current game running, but next levels will use new difficulty parameters
+    if (confirm("Changing difficulty will reset your current score and level. Continue?")) {
+        diffIdx = (diffIdx + 1) % DIFF_CONFIG.length;
+        applyDifficulty(diffIdx);
+        initGrid(false); 
+    }
 }
 
 function playSound(type) {
@@ -459,4 +459,5 @@ function loop(){
 </script>
 </body>
 </html>
+
 
