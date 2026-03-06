@@ -90,12 +90,12 @@ const levelEl = document.getElementById("level");
 const banner = document.getElementById("level-banner");
 
 const GRID = 16, TILE = 40;
-const ALL_COLORS = ["#FF355E","#66FF66","#50BFE6", "#FFD700", "#FF8C00", "#A020F0"];
+const ALL_COLORS = ["#FF355E","#66FF66","#50BFE6", "#FFD700 , "#A020F0" ", "#FF8C00"];
 
 const DIFF_CONFIG = [
     { name: "EASY", colors: 3, densityBase: 0.1, sizeBase: 5, densityMax: 0.45 },
     { name: "NORMAL", colors: 4, densityBase: 0.2, sizeBase: 7, densityMax: 0.45 },
-    { name: "HARD", colors: 4, densityBase: 0.3, sizeBase: 10, densityMax: 0.45 } 
+    { name: "HARD", colors: 5, densityBase: 0.3, sizeBase: 10, densityMax: 0.45 } 
 ];
 
 let diffIdx = 0; 
@@ -463,3 +463,4 @@ function loop(){
 </script>
 </body>
 </html>
+
